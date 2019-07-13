@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
 import Page1 from './components/Page1.jsx';
-import AsyncComponent from './components/AsyncComponent.jsx';
 
 class App extends Component {
 
@@ -11,26 +10,25 @@ class App extends Component {
     }
 
     onRouteChange = route => {
-        this.setState({route})
+
+        if (route === 'page1') this.setState({route});
+        if (route === 'page2') {
+            import('./components/Page2.jsx')
+                .then(component => this.setState({route, component: component.default}));
+                // the imported component will come across as a unmountable default obj,
+                // unless you use component.default
+        }
+        if (route === 'page3') {
+            import('./components/Page3.jsx')
+                .then(component => this.setState({route, component: component.default}));
+        }
     }
 
     render() {
         if (this.state.route === 'page1') {
             return <Page1 onRouteChange={this.onRouteChange}/>
         }
-
-        if (this.state.route === 'page2') {
-            const AsyncPage2 = AsyncComponent(() => import('./components/Page2.jsx'))
-            return <AsyncPage2 onRouteChange={this.onRouteChange}/>
-        }
-
-        if (this.state.route === 'page3') {
-            const AsyncPage3 = AsyncComponent(() => import('./components/Page3.jsx'))
-            return <AsyncPage3 onRouteChange={this.onRouteChange}/>
-        }
-
         return <this.state.component onRouteChange={this.onRouteChange}/>
-
     }
 
 }
